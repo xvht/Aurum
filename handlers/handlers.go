@@ -1,17 +1,27 @@
 package handlers
 
 import (
-	"vexal/handlers/index"
-	"vexal/handlers/misc"
+	"aurum/handlers/v1/misc"
 
 	"github.com/gofiber/fiber/v3"
 )
 
-var Handlers = map[string]func(c fiber.Ctx) error{
-	// Maintenance Handlers
-	"GET /api/version": misc.GetVersion, // Returns API version
-	"GET /api/health":  misc.GetHealth,  // Returns API health
+type Route struct {
+	Handler     fiber.Handler
+	Protected   bool
+	Middlewares []fiber.Handler
+}
 
-	// Default Handler
-	"GET /": index.Hello,
+var Handlers = map[string]Route{
+	// Default Handlers
+	"GET /": {
+		Handler:     misc.GetVersion,
+		Protected:   false,
+		Middlewares: []fiber.Handler{},
+	},
+	"GET /v1": {
+		Handler:     misc.GetVersion,
+		Protected:   false,
+		Middlewares: []fiber.Handler{},
+	},
 }

@@ -5,10 +5,14 @@ GOARCH ?= $(shell go env GOARCH)
 BIN_DIR := bin
 BIN_NAME := aurumServer
 
-build: build_amd64 build_arm64 build_386 build_arm build_ppc64 build_ppc64le build_s390x build_mips64 build_windows build_windows_386
+build_all: build_amd64 build_arm64 build_386 build_arm build_ppc64 build_ppc64le build_s390x build_mips64 build_windows build_windows_386
 
-build_me:
-	go build -o $(BIN_DIR)/$(BIN_NAME)
+build:
+ifeq ($(GOOS),windows)
+	$(MAKE) build_windows
+else
+	$(MAKE) build_single
+endif
 
 build_amd64:
 	GOARCH=amd64 $(MAKE) build_single
@@ -51,4 +55,6 @@ debug:
 
 clean:
 	@rm -rf $(BIN_DIR)
-	@echo "Deleted $(BIN_DIR)/"
+
+proto:
+	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative protos/*.proto

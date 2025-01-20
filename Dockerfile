@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN make build_me
+RUN make build
 
-CMD ["./bin/vexalServer"]
+CMD ["./bin/aurumServer-linux-amd64"]

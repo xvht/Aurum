@@ -10,7 +10,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./container/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - backend
     links:
