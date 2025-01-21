@@ -42,8 +42,8 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 		}
 
 		queryId := uuid.New().String()
-
 		response := types.BalanceResponse{QueryId: queryId, Error: false, Code: 200}
+
 		walletData, found, err := tracker.GetWalletBalance(strings.ToUpper(walletQuery.Chain), walletQuery.Address)
 		if err != nil {
 			response.Error = true
