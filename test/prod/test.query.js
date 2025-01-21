@@ -1,0 +1,24 @@
+const ws = new WebSocket(`wss://aurum.xvh.lol/v1/ws/query`);
+
+ws.onopen = () => {
+  console.log("connected");
+
+  const query = {
+    address: "2GUnfxZavKoPfS9s3VSEjaWDzB3vNf5RojUhprCS1rSx",
+    chain: "sol",
+  };
+
+  ws.send(JSON.stringify(query));
+};
+
+ws.onmessage = (event) => {
+  console.log(event.data.trim());
+};
+
+ws.onclose = () => {
+  console.log("disconnected");
+};
+
+ws.onerror = (error) => {
+  console.log(error);
+};
