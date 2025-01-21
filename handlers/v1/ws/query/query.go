@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	fiberWs "github.com/gofiber/websocket/v2"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +25,6 @@ func WebSocketHandler(c *fiber.Ctx) error {
 }
 
 func WebSocketEndpoint(c *fiberWs.Conn) {
-	// Register new client
 	clientsMux.Lock()
 	clients[c] = true
 	clientsMux.Unlock()
@@ -41,7 +41,9 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 			break
 		}
 
-		var response types.BalanceResponse
+		queryId := uuid.New().String()
+
+		response := types.BalanceResponse{QueryId: queryId, Error: false, Code: 200}
 		walletData, found, err := tracker.GetWalletBalance(strings.ToUpper(walletQuery.Chain), walletQuery.Address)
 		if err != nil {
 			response.Error = true
@@ -50,8 +52,6 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 			response.Error = true
 			response.Code = 404
 		} else {
-			response.Error = false
-			response.Code = 200
 			response.Data = walletData
 		}
 

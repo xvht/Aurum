@@ -6,7 +6,8 @@ type BalanceQuery struct {
 }
 
 type BalanceResponse struct {
-	Error bool       `json:"error"`
-	Code  int        `json:"code"`
-	Data  WalletData `json:"data"`
+	QueryId string     `json:"queryId"`
+	Error   bool       `json:"error"`
+	Code    int        `json:"code"`
+	Data    WalletData `json:"data"`
 }
