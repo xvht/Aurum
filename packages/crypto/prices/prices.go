@@ -24,7 +24,7 @@ var Instance = NewPriceTracker()
 func NewPriceTracker() *PriceTracker {
 	tracker := &PriceTracker{
 		prices: make(map[string]types.PriceData),
-		pairs:  []string{"btcusdt", "ethusdt", "ltcusdt", "solusdt", "trumpusdt"},
+		pairs:  []string{"btcusdt", "ethusdt", "ltcusdt", "solusdt"},
 	}
 	go tracker.connectToBinance()
 	return tracker
@@ -60,7 +60,6 @@ func (pt *PriceTracker) connectToBinance() {
 				continue
 			}
 
-			logrus.Infof("Updated price for %s: %s", binanceData.Symbol, binanceData.Price)
 			pt.updatePrice(binanceData)
 		}
 
