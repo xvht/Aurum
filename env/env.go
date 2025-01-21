@@ -4,5 +4,8 @@ var (
 	COMMIT_HASH string
 	BRANCH      string
 	REMOTE      string
-	PORT        string
+)
+
+var (
+	PORT string
 )

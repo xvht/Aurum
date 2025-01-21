@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://localhost:8000/v1/ws/prices`);
+const ws = new WebSocket(`ws://localhost:3000/v1/ws/prices`);
 
 ws.onopen = () => {
   console.log("connected");

@@ -87,12 +87,7 @@ func main() {
 	}
 	initEnv()
 
-	app := fiber.New(
-		fiber.Config{
-			// Prefork:               true,
-			DisableStartupMessage: true,
-		},
-	)
+	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 	registerHandlers(app, handlers.Handlers)
 
 	logrus.Infof("Server started on %s", env.PORT)
