@@ -9,3 +9,7 @@ var (
 var (
 	PORT string
 )
+
+var (
+	ETHERSCAN_API_KEY string
+)

@@ -1,7 +1,9 @@
-package crypto
+package prices
 
 import (
+	"aurum/types"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -11,51 +13,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type PriceData struct {
-	Symbol     string  `json:"symbol"`
-	Price      float64 `json:"price"`
-	Change24h  float64 `json:"change24h"`
-	Volume     float64 `json:"volume"`
-	High       float64 `json:"high"`
-	Low        float64 `json:"low"`
-	LastUpdate int64   `json:"lastUpdate"`
-}
-
-type binanceMessage struct {
-	EventType    string `json:"e"`
-	EventTime    int64  `json:"E"`
-	Symbol       string `json:"s"`
-	Change24h    string `json:"p"`
-	PriceChgPct  string `json:"P"`
-	WeightedAvg  string `json:"w"`
-	PrevClose    string `json:"x"`
-	Price        string `json:"c"`
-	LastQty      string `json:"Q"`
-	BidPrice     string `json:"b"`
-	BidQty       string `json:"B"`
-	AskPrice     string `json:"a"`
-	AskQty       string `json:"A"`
-	Open         string `json:"o"`
-	High         string `json:"h"`
-	Low          string `json:"l"`
-	Volume       string `json:"v"`
-	QuoteVolume  string `json:"q"`
-	OpenTime     int64  `json:"O"`
-	CloseTime    int64  `json:"C"`
-	FirstTradeId int64  `json:"F"`
-	LastTradeId  int64  `json:"L"`
-	TradeCount   int64  `json:"n"`
-}
-
 type PriceTracker struct {
-	prices    map[string]PriceData
+	prices    map[string]types.PriceData
 	pricesMux sync.RWMutex
 	pairs     []string
 }
 
+var Instance = NewPriceTracker()
+
 func NewPriceTracker() *PriceTracker {
 	tracker := &PriceTracker{
-		prices: make(map[string]PriceData),
+		prices: make(map[string]types.PriceData),
 		pairs:  []string{"btcusdt", "ethusdt", "ltcusdt", "solusdt"},
 	}
 	go tracker.connectToBinance()
@@ -86,7 +54,7 @@ func (pt *PriceTracker) connectToBinance() {
 				break
 			}
 
-			var binanceData binanceMessage
+			var binanceData types.BinanceMessage
 			if err := json.Unmarshal(message, &binanceData); err != nil {
 				logrus.Errorf("binance unmarshal error: %v", err)
 				continue
@@ -101,11 +69,11 @@ func (pt *PriceTracker) connectToBinance() {
 	}
 }
 
-func (pt *PriceTracker) updatePrice(data binanceMessage) {
+func (pt *PriceTracker) updatePrice(data types.BinanceMessage) {
 	pt.pricesMux.Lock()
 	defer pt.pricesMux.Unlock()
 
-	pt.prices[data.Symbol] = PriceData{
+	pt.prices[data.Symbol] = types.PriceData{
 		Symbol:     data.Symbol,
 		Price:      mustParseFloat(data.Price),
 		Change24h:  mustParseFloat(data.Change24h),
@@ -116,20 +84,19 @@ func (pt *PriceTracker) updatePrice(data binanceMessage) {
 	}
 }
 
-func (pt *PriceTracker) GetPrice(symbol string) (PriceData, bool) {
+func (pt *PriceTracker) GetPrice(symbol string) (types.PriceData, bool) {
 	pt.pricesMux.RLock()
 	defer pt.pricesMux.RUnlock()
 
-	price, exists := pt.prices[symbol]
+	price, exists := pt.prices[fmt.Sprintf("%s%s", symbol, "USDT")]
 	return price, exists
 }
 
-func (pt *PriceTracker) GetAllPrices() map[string]PriceData {
+func (pt *PriceTracker) GetAllPrices() map[string]types.PriceData {
 	pt.pricesMux.RLock()
 	defer pt.pricesMux.RUnlock()
 
-	// Return a copy to prevent external modifications
-	prices := make(map[string]PriceData, len(pt.prices))
+	prices := make(map[string]types.PriceData, len(pt.prices))
 	for k, v := range pt.prices {
 		prices[k] = v
 	}

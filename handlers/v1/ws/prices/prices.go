@@ -1,7 +1,7 @@
-package crypto
+package prices
 
 import (
-	"aurum/packages/crypto"
+	"aurum/packages/crypto/prices"
 	"sync"
 	"time"
 
@@ -13,7 +13,6 @@ import (
 var (
 	clients    = make(map[*fiberWs.Conn]bool)
 	clientsMux sync.RWMutex
-	tracker    *crypto.PriceTracker
 )
 
 func WebSocketHandler(c *fiber.Ctx) error {
@@ -31,7 +30,7 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 	clientsMux.Unlock()
 
 	// Send current prices immediately
-	priceData := tracker.GetAllPrices()
+	priceData := prices.Instance.GetAllPrices()
 	for _, price := range priceData {
 		err := c.WriteJSON(price)
 		if err != nil {
@@ -42,7 +41,7 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 
 	go func() {
 		for {
-			priceData := tracker.GetAllPrices()
+			priceData := prices.Instance.GetAllPrices()
 			for _, price := range priceData {
 				clientsMux.RLock()
 				for client := range clients {
@@ -66,12 +65,7 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 		}
 	}
 
-	// Unregister client on disconnect
 	clientsMux.Lock()
 	delete(clients, c)
 	clientsMux.Unlock()
-}
-
-func init() {
-	tracker = crypto.NewPriceTracker()
 }

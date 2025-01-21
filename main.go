@@ -39,7 +39,7 @@ func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
 		if method == "SOCKET" {
 			app.Use(route, handler.Handler)
 			app.Get(route, websocket.New(handler.Endpoint))
-			logrus.Infof("WebSocket: %s registered", route)
+			logrus.Infof("Router: %s %s registered as WebSocket", method, route)
 			continue
 		}
 
@@ -76,6 +76,7 @@ func initEnv() {
 	env.REMOTE = remote
 
 	env.PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
+	env.ETHERSCAN_API_KEY = os.Getenv("ETHERSCAN_API_KEY")
 }
 
 func main() {

@@ -1,7 +1,14 @@
-const ws = new WebSocket(`ws://localhost:3000/v1/ws/prices`);
+const ws = new WebSocket(`ws://localhost:8000/v1/ws/query`);
 
 ws.onopen = () => {
   console.log("connected");
+
+  const query = {
+    address: "2GUnfxZavKoPfS9s3VSEjaWDzB3vNf5RojUhprCS1rSx",
+    chain: "sol",
+  };
+
+  ws.send(JSON.stringify(query));
 };
 
 ws.onmessage = (event) => {

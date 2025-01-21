@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"aurum/handlers/v1/crypto"
 	"aurum/handlers/v1/misc"
+	"aurum/handlers/v1/ws/prices"
+	"aurum/handlers/v1/ws/query"
 
 	"github.com/gofiber/fiber/v2"
 	fiberWs "github.com/gofiber/websocket/v2"
@@ -18,26 +19,19 @@ type Route struct {
 var Handlers = map[string]Route{
 	// Default Handlers
 	"GET /": {
-		Handler:     misc.GetVersion,
-		Protected:   false,
-		Middlewares: []fiber.Handler{},
+		Handler: misc.GetVersion,
 	},
 	"GET /v1": {
-		Handler:     misc.GetVersion,
-		Protected:   false,
-		Middlewares: []fiber.Handler{},
+		Handler: misc.GetVersion,
 	},
 
 	// WebSocket Handlers
-	"GET /v1/ws/prices": {
-		Handler:     crypto.WebSocketHandler,
-		Protected:   false,
-		Middlewares: []fiber.Handler{},
-	},
 	"SOCKET /v1/ws/prices": {
-		Handler:     crypto.WebSocketHandler,
-		Endpoint:    crypto.WebSocketEndpoint,
-		Protected:   false,
-		Middlewares: []fiber.Handler{},
+		Handler:  prices.WebSocketHandler,
+		Endpoint: prices.WebSocketEndpoint,
+	},
+	"SOCKET /v1/ws/query": {
+		Handler:  query.WebSocketHandler,
+		Endpoint: query.WebSocketEndpoint,
 	},
 }
