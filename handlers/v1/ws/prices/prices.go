@@ -17,7 +17,6 @@ var (
 
 func WebSocketHandler(c *fiber.Ctx) error {
 	if fiberWs.IsWebSocketUpgrade(c) {
-		logrus.Infof("WebSocket connection from %s", c.IP())
 		return c.Next()
 	}
 	return fiber.ErrUpgradeRequired
