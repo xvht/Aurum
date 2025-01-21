@@ -9,7 +9,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	fiberWs "github.com/gofiber/websocket/v2"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,9 +62,7 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 				return
 			}
 
-			queryId := uuid.New().String()
-			response := types.BalanceResponse{QueryId: queryId, Error: false, Code: 200}
-
+			response := types.BalanceResponse{QueryId: walletQuery.QueryId, Error: false, Code: 200}
 			walletData, found, err := tracker.GetWalletBalance(strings.ToUpper(walletQuery.Chain), walletQuery.Address)
 			if err != nil {
 				response.Error = true

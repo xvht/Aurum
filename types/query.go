@@ -1,6 +1,7 @@
 package types
 
 type BalanceQuery struct {
+	QueryId string `json:"queryId"`
 	Address string `json:"address"`
 	Chain   string `json:"chain"`
 }
