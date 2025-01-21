@@ -8,7 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +21,7 @@ func init() {
 }
 
 func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
-	methodMap := map[string]func(path string, handler fiber.Handler, middleware ...fiber.Handler) fiber.Router{
+	methodMap := map[string]func(path string, handlers ...fiber.Handler) fiber.Router{
 		"GET":     app.Get,
 		"POST":    app.Post,
 		"PUT":     app.Put,
@@ -28,18 +29,27 @@ func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
 		"PATCH":   app.Patch,
 		"OPTIONS": app.Options,
 		"HEAD":    app.Head,
+		"SOCKET":  app.Get,
 	}
 
 	for path, handler := range handlers {
 		parts := strings.Split(strings.TrimSpace(path), " ")
 		method, route := parts[0], parts[1]
 
-		if registerFunc, ok := methodMap[method]; ok {
-			var middlewareChain []fiber.Handler
-			middlewareChain = append(middlewareChain, handler.Middlewares...)
+		if method == "SOCKET" {
+			app.Use(route, handler.Handler)
+			app.Get(route, websocket.New(handler.Endpoint))
+			logrus.Infof("WebSocket: %s registered", route)
+			continue
+		}
 
-			registerFunc(route, handler.Handler, middlewareChain...)
-			logrus.Infof("Router: %s %s registered with %d middleware(s)", method, route, len(middlewareChain))
+		if registerFunc, ok := methodMap[method]; ok {
+			var handlerPipeline []fiber.Handler
+			handlerPipeline = append(handlerPipeline, handler.Handler)
+			handlerPipeline = append(handlerPipeline, handler.Middlewares...)
+
+			registerFunc(route, handlerPipeline...)
+			logrus.Infof("Router: %s %s registered with %d middleware(s)", method, route, len(handlerPipeline)-1)
 		} else {
 			logrus.Fatalf("Invalid method: %s", method)
 		}
@@ -52,21 +62,18 @@ func initEnv() {
 		logrus.Fatalf("Error getting git commit: %v", err)
 	}
 	env.COMMIT_HASH = commit
-	logrus.Infof("Commit hash: %s", env.COMMIT_HASH)
 
 	branch, err := gitinfo.GetBranch()
 	if err != nil {
 		logrus.Fatalf("Error getting git branch: %v", err)
 	}
 	env.BRANCH = branch
-	logrus.Infof("Branch: %s", env.BRANCH)
 
 	remote, err := gitinfo.GetRemote()
 	if err != nil {
 		logrus.Fatalf("Error getting git remote: %v", err)
 	}
 	env.REMOTE = remote
-	logrus.Infof("Remote: %s", env.REMOTE)
 
 	env.PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
 }
@@ -80,9 +87,14 @@ func main() {
 	}
 	initEnv()
 
-	app := fiber.New()
+	app := fiber.New(
+		fiber.Config{
+			// Prefork:               true,
+			DisableStartupMessage: true,
+		},
+	)
 	registerHandlers(app, handlers.Handlers)
 
 	logrus.Infof("Server started on %s", env.PORT)
-	logrus.Fatal(app.Listen(env.PORT, fiber.ListenConfig{DisableStartupMessage: true}))
+	logrus.Fatal(app.Listen(env.PORT))
 }

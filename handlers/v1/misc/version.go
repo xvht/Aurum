@@ -3,11 +3,11 @@ package misc
 import (
 	"aurum/env"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 )
 
 // GET /api/version
-func GetVersion(c fiber.Ctx) error {
+func GetVersion(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"error": false,
 		"code":  200,
