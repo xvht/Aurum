@@ -4,6 +4,7 @@ ws.onopen = () => {
   console.log("connected");
 
   const query = {
+    queryId: crypto.randomUUID(),
     address: "2GUnfxZavKoPfS9s3VSEjaWDzB3vNf5RojUhprCS1rSx",
     chain: "sol",
   };
