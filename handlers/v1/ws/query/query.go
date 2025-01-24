@@ -2,6 +2,7 @@ package query
 
 import (
 	"aurum/packages/crypto/tracker"
+	"aurum/packages/helpers/validator"
 	"aurum/types"
 	"strings"
 	"sync"
@@ -60,6 +61,16 @@ func WebSocketEndpoint(c *fiberWs.Conn) {
 				logrus.Errorf("read error: %v", err)
 				done <- struct{}{}
 				return
+			}
+
+			if (validator.ValidateFields(walletQuery)) != nil {
+				response := types.BalanceResponse{Error: true, Code: 400}
+				if err := c.WriteJSON(response); err != nil {
+					logrus.Errorf("write error: %v", err)
+					done <- struct{}{}
+					return
+				}
+				continue
 			}
 
 			response := types.BalanceResponse{QueryId: walletQuery.QueryId, Error: false, Code: 200}
