@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// GET /api/version
+// GET /v1/version
 func GetVersion(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"error": false,

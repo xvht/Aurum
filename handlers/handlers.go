@@ -24,6 +24,9 @@ var Handlers = map[string]Route{
 	"GET /v1": {
 		Handler: misc.GetVersion,
 	},
+	"GET /v1/health": {
+		Handler: misc.GetHealth,
+	},
 
 	// WebSocket Handlers
 	"SOCKET /v1/ws/prices": {

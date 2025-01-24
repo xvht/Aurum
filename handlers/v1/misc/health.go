@@ -4,11 +4,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// GET /api/health
+// GET /v1/health
 func GetHealth(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
-		"success": true,
-		"message": "API health",
-		"result":  "healthy",
+		"error": false,
+		"code":  200,
+		"data":  "API is healthy",
 	})
 }
