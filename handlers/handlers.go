@@ -12,7 +12,6 @@ import (
 type Route struct {
 	Handler     fiber.Handler
 	Endpoint    func(*fiberWs.Conn)
-	Protected   bool
 	Middlewares []fiber.Handler
 }
 

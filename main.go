@@ -29,7 +29,6 @@ func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
 		"PATCH":   app.Patch,
 		"OPTIONS": app.Options,
 		"HEAD":    app.Head,
-		"SOCKET":  app.Get,
 	}
 
 	for path, handler := range handlers {
