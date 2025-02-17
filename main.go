@@ -44,8 +44,8 @@ func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
 
 		if registerFunc, ok := methodMap[method]; ok {
 			var handlerPipeline []fiber.Handler
-			handlerPipeline = append(handlerPipeline, handler.Handler)
 			handlerPipeline = append(handlerPipeline, handler.Middlewares...)
+			handlerPipeline = append(handlerPipeline, handler.Handler)
 
 			registerFunc(route, handlerPipeline...)
 			logrus.Infof("Router: %s %s registered with %d middleware(s)", method, route, len(handlerPipeline)-1)
