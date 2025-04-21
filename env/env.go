@@ -7,7 +7,8 @@ var (
 )
 
 var (
-	PORT string
+	PORT      string
+	LOG_LEVEL string = "info"
 )
 
 var (

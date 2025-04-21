@@ -20,6 +20,19 @@ func init() {
 	})
 }
 
+func initLogLevel() {
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = "info"
+	}
+
+	level, err := logrus.ParseLevel(logLevel)
+	if err != nil {
+		logrus.Fatalf("Invalid log level: %v", err)
+	}
+	logrus.SetLevel(level)
+}
+
 func registerHandlers(app *fiber.App, handlers map[string]handlers.Route) {
 	methodMap := map[string]func(path string, handlers ...fiber.Handler) fiber.Router{
 		"GET":     app.Get,
@@ -76,6 +89,7 @@ func initEnv() {
 
 	env.PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
 	env.ETHERSCAN_API_KEY = os.Getenv("ETHERSCAN_API_KEY")
+	env.LOG_LEVEL = os.Getenv("LOG_LEVEL")
 }
 
 func main() {
@@ -86,6 +100,7 @@ func main() {
 		logrus.Fatalf("Error loading .env file: %v", err)
 	}
 	initEnv()
+	initLogLevel()
 
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 	registerHandlers(app, handlers.Handlers)

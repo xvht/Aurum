@@ -51,7 +51,12 @@ build_single:
 	go build -o $(BIN_DIR)/$(BIN_NAME)-$(GOOS)-$(GOARCH)
 
 debug:
+	@echo "Building debug version for $(GOOS)/$(GOARCH)..."
 	go build -tags debug -gcflags "all=-N -l" -o $(BIN_DIR)/$(BIN_NAME)-$(GOOS)-$(GOARCH)-debug
+	@echo "Debug build created at $(BIN_DIR)/$(BIN_NAME)-$(GOOS)-$(GOARCH)-debug"
+	
+	@echo "Running debug build..."
+	@$(BIN_DIR)/$(BIN_NAME)-$(GOOS)-$(GOARCH)-debug
 
 clean:
 	@rm -rf $(BIN_DIR)
